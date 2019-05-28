@@ -18,38 +18,47 @@ import com.litoos11.bolsaideas.app.service.IClienteService;
 @Service("clienteServiceImpl")
 public class ClienteServiceImpl implements IClienteService {
 
-	 @Autowired
-	 @Qualifier("clienteRepository")
-	 private IClienteRepository clienteRepository;
+	@Autowired
+	@Qualifier("clienteRepository")
+	private IClienteRepository clienteRepository;
 
 	@PersistenceContext
 	private EntityManager em;
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(readOnly = true)
+	public ClienteEntity findById(Long id) {
+		return clienteRepository.findById(id).orElse(null) ;
+		// return em.find(ClienteEntity.class, id);
+	}
+
+	//@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	@Override
 	public List<ClienteEntity> findAll() {
-		//return clienteRepository.findAll();
-		return em.createQuery("from ClienteEntity").getResultList();
+		return clienteRepository.findAll();
+		//return em.createQuery("from ClienteEntity").getResultList();
 	}
 
 	@Override
 	@Transactional
 	public ClienteEntity save(ClienteEntity cliente) {
 		return clienteRepository.save(cliente);
-		/*if(cliente.getId() != null && cliente.getId() > 0) {
-			em.merge(cliente);
-		}else {
-			em.persist(cliente);
-		}*/
-		
+		/*
+		 * if(cliente.getId() != null && cliente.getId() > 0) { em.merge(cliente); }else
+		 * { em.persist(cliente); }
+		 */
+
 	}
 
-	public ClienteEntity findById(Long id) {
-		return clienteRepository.findById(id);
-		//return em.find(ClienteEntity.class, id);
+	@Override
+	@Transactional
+	public void deleteById(Long id) {
+		ClienteEntity cliente = findById(id);
+		if (null != cliente) {
+			clienteRepository.delete(cliente);
+			// em.remove(cliente);
+		}
 	}
-
-
 
 }

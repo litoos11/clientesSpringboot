@@ -11,4 +11,6 @@ public interface IClienteService {
 	public ClienteEntity save(ClienteEntity cliente);
 	
 	public ClienteEntity findById(Long id); 
+	
+	public void deleteById(Long id);
 }

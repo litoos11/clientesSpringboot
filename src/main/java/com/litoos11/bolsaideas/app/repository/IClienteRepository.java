@@ -10,5 +10,5 @@ import com.litoos11.bolsaideas.app.entity.ClienteEntity;
 @Repository("clienteRepository")
 public interface IClienteRepository extends JpaRepository<ClienteEntity, Serializable> {
 
-	public abstract ClienteEntity findById(Long id);
+	//public abstract ClienteEntity findById(Long id);
 }
