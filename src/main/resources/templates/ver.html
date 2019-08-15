@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head th:replace="layout/layout :: head"></head>
+<body>
+<header th:replace="layout/layout :: header"></header>
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
+			<div class="card-header" th:text="${titulo}"></div>
+			<div class="card-body">
+			 <!-- th:if="${#strings.length(cliente.foto) > 0}" -->
+				<img th:if="${cliente.foto} != null" class="img-thumbnail rounded float-left" style="max-width: 25%;"
+					th:src="@{/uploads/__${cliente.foto}__}" th:alt="${cliente.foto}" />
+					
+				<ul class="list-group list-group-item-secondary">
+					<li class="list-group-item list-group-item-secondary" th:text="${cliente.nombre}"></li>
+					<li class="list-group-item list-group-item-secondary" th:text="${cliente.apellido}"></li>
+					<li class="list-group-item list-group-item-secondary" th:text="${cliente.correo}"></li>
+					<li class="list-group-item list-group-item-secondary" th:text="${cliente.fechaAlta}"></li>
+				</ul>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- <footer th:replace="layout/layout :: footer"></footer> -->
+</body>
+</html>

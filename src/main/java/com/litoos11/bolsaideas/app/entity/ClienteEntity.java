@@ -43,6 +43,8 @@ public class ClienteEntity implements Serializable {
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date fechaAlta;
+	
+	private String foto;
 
 	public Long getId() {
 		return id;
@@ -87,10 +89,20 @@ public class ClienteEntity implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+	public String getFoto() {
+		return foto;
+	}
+
+	public void setFoto(String foto) {
+		this.foto = foto;
+	}
 	
 //	@PrePersist
 //	public void prePersist() {
 //		fechaAlta = new Date();
 //	}
+	
+	
 
 }

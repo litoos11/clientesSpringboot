@@ -1,51 +1,51 @@
-package com.litoos11.bolsaideas.app.component;
+package com.litoos11.bolsaideas.app.util.panginator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-//@Component("paginadorComponent")
-public class PaginadorComponent<T> {
-
+public class PageRender<T> {
+	
 	private String url;
 	private Page<T> page;
+	
 	private int totalPaginas;
 	private int numElementosPorPagina;
 	private int paginaActual;
-
-
-	private List<PaginaComponent> paginas;
+	private List<PageItem> paginas;
 	
-	public PaginadorComponent(String url, Page<T> page) {
+	public PageRender(String url, Page<T> page) {
+		//super();
 		this.url = url;
 		this.page = page;
-		this.paginas = new ArrayList<PaginaComponent>();
-
+		this.paginas = new ArrayList<PageItem>();
+		
 		numElementosPorPagina = page.getSize();
 		totalPaginas = page.getTotalPages();
 		paginaActual = page.getNumber() + 1;
-
+		
 		int desde, hasta;
-		if (totalPaginas <= numElementosPorPagina) {
+		if(totalPaginas <= numElementosPorPagina) {
 			desde = 1;
 			hasta = totalPaginas;
-		} else {
-			if (paginaActual <= numElementosPorPagina / 2) {
+		}else {
+			if(paginaActual <= numElementosPorPagina/2) {
 				desde = 1;
 				hasta = numElementosPorPagina;
-			} else if (paginaActual >= totalPaginas - numElementosPorPagina / 2) {
+			}else if(paginaActual >= totalPaginas - numElementosPorPagina/2) {
 				desde = totalPaginas - numElementosPorPagina + 1;
 				hasta = numElementosPorPagina;
-			} else {
-				desde = paginaActual - numElementosPorPagina / 2;
+			}else {
+				desde = paginaActual - numElementosPorPagina/2;
 				hasta = numElementosPorPagina;
 			}
 		}
 		
-		for(int i = 0; i<hasta; i++) {
-			paginas.add(new PaginaComponent(desde + i, paginaActual == desde + i));
+		for(int i=0; i < hasta; i++) {
+			paginas.add(new PageItem(desde + i, paginaActual == desde + i));
 		}
+		
 	}
 
 	public String getUrl() {
@@ -60,7 +60,7 @@ public class PaginadorComponent<T> {
 		return paginaActual;
 	}
 
-	public List<PaginaComponent> getPaginas() {
+	public List<PageItem> getPaginas() {
 		return paginas;
 	}
 	
@@ -76,7 +76,7 @@ public class PaginadorComponent<T> {
 		return page.hasNext();
 	}
 	
-	public boolean isHasPrevious() {
+	public boolean isHasPrevius() {
 		return page.hasPrevious();
 	}
 }
