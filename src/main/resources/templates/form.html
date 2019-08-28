@@ -9,7 +9,7 @@
 			<div class="card-header" th:text="${titulo}"></div>
 			<div class="card-body">
 
-				<form th:action="@{/clientes/save}" th:object="${cliente}"
+				<form th:action="@{/cliente/save}" th:object="${cliente}"
 					method="post" enctype="multipart/form-data">
 
 					<div class="form-group row">
@@ -70,7 +70,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- <footer th:replace="layout/layout :: footer"></footer> -->
+	<footer th:replace="layout/layout :: footer"></footer>
 
 </body>
 </html>

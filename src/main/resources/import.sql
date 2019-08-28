@@ -22,3 +22,13 @@ INSERT INTO clientes (id, nombre, apellido, correo, fecha_alta, foto) VALUES(21,
 INSERT INTO clientes (id, nombre, apellido, correo, fecha_alta, foto) VALUES(22, 'Juan', 'Ortiz', 'jortiz@litoos.com', '2019-05-22', '');
 INSERT INTO clientes (id, nombre, apellido, correo, fecha_alta, foto) VALUES(23, 'Lili', 'Barron', 'blili@litoos.com', '2019-05-22', '');
 INSERT INTO clientes (id, nombre, apellido, correo, fecha_alta, foto) VALUES(24, 'Angel', 'Ortiz', 'aortiz@litoos.com', '2019-05-22', '');
+
+
+
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('Panasonic Pantalla LCD',  25990, NOW());
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('Sony Camara digital DSC-W320B',  123490, NOW());
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('Aple Ipad',  2290, NOW());
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('Sony Notebook',  78540, NOW());
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('HP Multifuncional',  75410, NOW());
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('Bicicleta bennoto',  12540, NOW());
+INSERT INTO productos (nombre, precio, fecha_alta) VALUES('Comoda Alex 5 cajones',  3290, NOW());
