@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head th:replace="layout/layout :: head"></head>
+<body>
+	<header th:replace="layout/layout :: header"></header>
+
+	<div class="container py-4">
+		<div class="card bg-danger text-white">
+			<div class="card-header">Error: Acceso denegado!</div>
+			<div class="card-body text-center">
+				<h5 class="card-title">
+					Lo sentimos <span th:text="${#authentication.name}"></span>,
+					no tiene permisos para acceder a este recurso!
+				</h5>
+				<a th:href="@{/cliente/list}" class="btn btn-outline-light float-right" role="button">Ir al incio</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- <footer th:replace="layout/layout :: footer"></footer> -->
+</body>
+</html>

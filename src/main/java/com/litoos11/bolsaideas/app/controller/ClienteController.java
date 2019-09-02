@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,44 +36,48 @@ public class ClienteController {
 	private static final String CLIENTES_VIEW = "clientes";
 	private static final String FORM_CLIENTE_VIEW = "form";
 	private static final String VER_VIEW = "ver";
-	
+
 	private static final Log LOG = LogFactory.getLog(ClienteController.class);
 
 	@Autowired
 	@Qualifier("clienteServiceImpl")
 	private IClienteService clienteService;
-	
+
 	@Autowired
 	@Qualifier("uploadFileServiceImpl")
 	private IUploadFileService uploadFileService;
-	
-	
+
 	@GetMapping("/ver")
-	public ModelAndView ver(@RequestParam(name = "id") Long id,RedirectAttributes flash) {
+	public ModelAndView ver(@RequestParam(name = "id") Long id, RedirectAttributes flash) {
 		ModelAndView mav = new ModelAndView(VER_VIEW);
-		
-		//ClienteEntity cliente = clienteService.findById(id);
+
+		// ClienteEntity cliente = clienteService.findById(id);
 		ClienteEntity cliente = clienteService.fetchClienteByIdWithFacturas(id);
-		if(cliente == null) {
+		if (cliente == null) {
 			flash.addAttribute("error", "El cliente no existe en la DB");
 			mav.setViewName("redirect:/cliente/list");
 		}
-		
+
 		mav.addObject("cliente", cliente);
 		mav.addObject("titulo", "Detalle cliente: " + cliente.getNombre());
-		
+
 		return mav;
 	}
-	
-	@GetMapping("/list")
-	public ModelAndView listar(@RequestParam(name="page", defaultValue="0") int page) {
-		//cuantas elementos por paginas mostramos
+
+	@GetMapping({ "/list", "/" })
+	public ModelAndView listar(@RequestParam(name = "page", defaultValue = "0") int page,
+			Authentication authentication) {
+		if(authentication != null) {
+			LOG.info("Hola usuario, tu user name es: ".concat(authentication.getName()));
+		}
+		
+		// cuantas elementos por paginas mostramos
 		Pageable pageRequest = PageRequest.of(page, 3);
-		
+
 		Page<ClienteEntity> clientes = clienteService.findAll(pageRequest);
-		
+
 		PaginadorComponent<ClienteEntity> paginadorComponent = new PaginadorComponent<>("/cliente/list", clientes);
-		
+
 		ModelAndView mav = new ModelAndView(CLIENTES_VIEW);
 		mav.addObject("titulo", "Clientes");
 		mav.addObject("clientes", clientes);
@@ -80,13 +85,9 @@ public class ClienteController {
 		return mav;
 	}
 
-
 	@PostMapping("/save")
-	public ModelAndView guardar(@Valid @ModelAttribute("cliente") ClienteEntity cliente,			
-			BindingResult result,
-			RedirectAttributes flash,
-			SessionStatus status,
-			@RequestParam(name = "file") MultipartFile foto) {
+	public ModelAndView guardar(@Valid @ModelAttribute("cliente") ClienteEntity cliente, BindingResult result,
+			RedirectAttributes flash, SessionStatus status, @RequestParam(name = "file") MultipartFile foto) {
 		ModelAndView mav = new ModelAndView();
 		if (result.hasErrors()) {
 			// LOG.info("Object client: " + cliente.getNombre());
@@ -94,41 +95,38 @@ public class ClienteController {
 			mav.addObject("titulo", "Alta de Cliente");
 			return mav;
 		}
-		//LOG.info("ID: " + cliente.getId() + "     Foto: " + cliente.getFoto() + "	NOMBRE: " +cliente.getNombre());
-		
-		if(cliente.getId() != null) {
+		// LOG.info("ID: " + cliente.getId() + " Foto: " + cliente.getFoto() + " NOMBRE:
+		// " +cliente.getNombre());
+
+		if (cliente.getId() != null) {
 			ClienteEntity antiguoCliente = clienteService.findById(cliente.getId());
 			cliente.setFoto(antiguoCliente.getFoto());
 		}
-		
+
 		LOG.info("ID: " + cliente.getId() + "     Foto: " + cliente.getFoto());
-			if(!foto.isEmpty()) {				
-				if(cliente.getId() != null
-						&& cliente.getId() > 0) {
-					
-					uploadFileService.delete(cliente.getFoto());				
-					
-				}			
-				
-				String uniqueFileName= null;
-				try {
-					uniqueFileName = uploadFileService.copy(foto);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				flash.addFlashAttribute("info", "Ha subidó correctamente '" + uniqueFileName +"'");			
-				cliente.setFoto(uniqueFileName);
-				
+		if (!foto.isEmpty()) {
+			if (cliente.getId() != null && cliente.getId() > 0) {
+
+				uploadFileService.delete(cliente.getFoto());
+
 			}
-		
-		
-		
-		
+
+			String uniqueFileName = null;
+			try {
+				uniqueFileName = uploadFileService.copy(foto);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			flash.addFlashAttribute("info", "Ha subidó correctamente '" + uniqueFileName + "'");
+			cliente.setFoto(uniqueFileName);
+
+		}
+
 		// Investigar como aprovechar el cliente que devuelve
 		String msgFlash = (null != cliente.getId()) ? "Cliente editado con éxito!" : "Cliente creado con éxito!";
-		
+
 		clienteService.save(cliente);
 		status.setComplete();
 		flash.addFlashAttribute("success", msgFlash);
@@ -161,11 +159,11 @@ public class ClienteController {
 		ModelAndView mav = new ModelAndView("redirect:/cliente/list");
 		if (id != 0) {
 			ClienteEntity cliente = clienteService.findById(id);
-			
+
 			clienteService.deleteById(id);
-			flash.addFlashAttribute("success", "Cliente eliminado con éxito!");			
-			
-			if(uploadFileService.delete(cliente.getFoto())) {
+			flash.addFlashAttribute("success", "Cliente eliminado con éxito!");
+
+			if (uploadFileService.delete(cliente.getFoto())) {
 				flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " eliminado con éxito!");
 			}
 		}

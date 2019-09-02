@@ -18,13 +18,34 @@
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNav">
-				<ul class="navbar-nav">
+				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active"><a class="nav-link"
 						th:href="@{/cliente/list}">Home <span class="sr-only">(current)</span>
 					</a></li>
-					<li class="nav-item"><a class="nav-link"
-						th:href="@{/cliente/list}">Clientes</a></li>
+					<!-- <li class="nav-item"><a class="nav-link"
+						th:href="@{/cliente/list}">Clientes</a></li> -->
 
+				</ul>
+
+				<ul class="navbar-nav navbar-right">
+					<li sec:authorize="!isAuthenticated()"><a
+						class="btn btn-outline-primary" th:href="@{/login}">Iniciar
+							Sesión</a></li>
+
+					<li sec:authorize="isAuthenticated()" class="dropdown show"><a
+						class="btn btn-outline-primary dropdown-toggle" href="#"
+						role="button" id="dropdownMenuLink" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false"><span
+							sec:authentication="name"></span></a>
+
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+							<form th:action="@{/logout}" method="post" id="logoutForm">
+								<!-- <button class="dropdown-item"
+									onclick="document.getElementById('logoutForm').submit();"
+									type="submit">Cerrar sesión</button> -->
+								<input class="dropdown-item" type="submit" value="Cerrar sesión"/>
+							</form>
+						</div></li>
 				</ul>
 			</div>
 		</nav>
@@ -43,17 +64,21 @@
 
 	<footer th:fragment="footer" class="container">
 		<hr />
-
-		<img th:src="@{/img/springboot.png}" alt="Spring log" />
-
-		<p>
-			Power by <a th:href="@{https://github.com/litoos11}"
-				th:targer="_blank">litoos11</a>
+		<p sec:authorize="isAuthenticated()">
+			Usuario: <span sec:authentication="name"></span> | Roles: <span
+				sec:authentication="principal.authorities"></span>
 		</p>
 		<p>
 			Este curso fue desarrollado en IDE Eclipse, Springboot, JPA,
-			Hibernate, Mysql, Bootstarp y Thymeleaf. <br /> &copy; Company 2018,
-			Sin derechos reservados, terminos de uso ni privacidas.
+			Hibernate, Mysql, Bootstarp y Thymeleaf. <img
+				th:src="@{/img/springboot.png}" alt="Spring log"
+				class="img-thumbnail float-rigth" style="max-width: 25%;" />
+		</p>
+		<hr />
+		<p>
+			Power by <a th:href="@{https://github.com/litoos11}"
+				th:targer="_blank">litoos11</a> &copy;Company 2018, Sin derechos
+			reservados, terminos de uso ni privacidas.
 		</p>
 
 		<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
