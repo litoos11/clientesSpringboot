@@ -1,7 +1,9 @@
 package com.litoos11.bolsaideas.app.controller;
 
 import java.io.IOException;
+import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.logging.Log;
@@ -11,7 +13,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,13 +73,43 @@ public class ClienteController {
 		return mav;
 	}
 
+	//@Secured("ROLE_USER") ó el siguiente
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping({ "/list", "/" })
-	public ModelAndView listar(@RequestParam(name = "page", defaultValue = "0") int page,
-			Authentication authentication) {
-		if(authentication != null) {
+	public ModelAndView listar(@RequestParam(name = "page", defaultValue = "0") int page, Authentication authentication,
+			HttpServletRequest request) {
+		if (authentication != null) {
 			LOG.info("Hola usuario, tu user name es: ".concat(authentication.getName()));
 		}
-		
+
+		// Validando roles de usuarios con nuestro propio metodo "hasRole()"
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+		if (hasRole("ROLE_ADMIN")) {
+			LOG.info("Hola: ".concat(auth.getName()).concat(" tienes acceso!"));
+		} else {
+			LOG.info("Hola: ".concat(auth.getName()).concat(" no tienes acceso!"));
+		}
+
+		// validando roles de usuarios con clase
+		// "SecurityContextHolderAwareRequestWrapper"
+		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request,
+				"ROLE_");
+
+		if (securityContext.isUserInRole("ADMIN")) {
+			LOG.info("Con clase SecurityContextHolderAwareRequestWrapper ---> Hola: ".concat(auth.getName())
+					.concat(" tienes acceso!"));
+		} else {
+			LOG.info("Con clase SecurityContextHolderAwareRequestWrapper --->  Hola: ".concat(auth.getName())
+					.concat(" no tienes acceso!"));
+		}
+
+		// Validando roles de usuarios con el objeto request
+		if (request.isUserInRole("ROLE_ADMIN")) {
+			LOG.info("Con objeto request --> Hola: ".concat(auth.getName()).concat(" tienes acceso!"));
+		} else {
+			LOG.info("Con objeto request --> Hola: ".concat(auth.getName()).concat(" no tienes acceso!"));
+		}
 		// cuantas elementos por paginas mostramos
 		Pageable pageRequest = PageRequest.of(page, 3);
 
@@ -85,7 +124,9 @@ public class ClienteController {
 		return mav;
 	}
 
-	@PostMapping("/save")
+	//@Secured("ROLE_ADMIN") ó
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+	@PostMapping("/save") 
 	public ModelAndView guardar(@Valid @ModelAttribute("cliente") ClienteEntity cliente, BindingResult result,
 			RedirectAttributes flash, SessionStatus status, @RequestParam(name = "file") MultipartFile foto) {
 		ModelAndView mav = new ModelAndView();
@@ -134,6 +175,7 @@ public class ClienteController {
 		return mav;
 	}
 
+	@Secured("ROLE_ADMIN")
 	@GetMapping("/form")
 	public ModelAndView crearOrEditar(@RequestParam(name = "id", required = false) Long id, RedirectAttributes flash) {
 		ModelAndView mav = new ModelAndView(FORM_CLIENTE_VIEW);
@@ -154,6 +196,7 @@ public class ClienteController {
 		return mav;
 	}
 
+	@Secured("ROLE_ADMIN")
 	@GetMapping("/delete")
 	public ModelAndView eliminar(@RequestParam(name = "id", required = true) Long id, RedirectAttributes flash) {
 		ModelAndView mav = new ModelAndView("redirect:/cliente/list");
@@ -168,5 +211,29 @@ public class ClienteController {
 			}
 		}
 		return mav;
+	}
+
+	public boolean hasRole(String role) {
+		SecurityContext context = SecurityContextHolder.getContext();
+		if (context == null) {
+			return false;
+		}
+
+		Authentication auth = context.getAuthentication();
+		if (auth == null) {
+			return false;
+		}
+
+		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+
+		return authorities.contains(new SimpleGrantedAuthority(role));
+		/*
+		 * for(GrantedAuthority authority: authorities) {
+		 * if(role.equals(authority.getAuthority())) {
+		 * LOG.info("Hola usuario: ".concat(auth.getName()).concat(" tu rol es :").
+		 * concat(authority.getAuthority())); return true; } }
+		 * 
+		 * return false;
+		 */
 	}
 }
